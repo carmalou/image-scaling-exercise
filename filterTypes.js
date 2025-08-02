@@ -50,6 +50,26 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
       break
 
+    case 2:
+      if (bitDepth === 8) {
+        let unfilteredPixels = []
+
+        currentRow.forEach((value, i) => {
+          // first byte is the filtertype, skip it
+          if (i === 0) {
+            return
+          }
+
+          const b = previousRow[i]
+
+          unfilteredPixels.push((value + b) % 256)
+        })
+
+        return unfilteredPixels
+      }
+
+      break
+
     case 3:
       if (bitDepth === 8) {
         // average
