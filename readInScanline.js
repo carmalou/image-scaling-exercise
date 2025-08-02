@@ -1,5 +1,6 @@
 const fs = require('fs')
 const zlib = require('zlib')
+const applyPixelFilter = require('./filterTypes.js')
 
 const colorChannelMatrix = {
   0: 1,
@@ -24,6 +25,8 @@ function main() {
       signature: ${JSON.stringify(signature, null, 2)}
       
       `)
+
+    parsePixels(signature, pixelBytes)
   })
 }
 
@@ -48,6 +51,7 @@ function parsePng(data) {
     let chunkName = data.toString('ascii', i + 4, i + 8)
     let chunkData = data.subarray(i + 8, i + 8 + chunkLength)
 
+    // get and set the signature
     if (chunkName == 'IHDR') {
       let ihdr = i + 8
       width = data.readUInt32BE(ihdr)
@@ -59,11 +63,14 @@ function parsePng(data) {
       interlace = data[ihdr + 12]
     }
 
+    // get each chunk of pixels
     if (chunkName == 'IDAT') {
       idatBuffers.push(chunkData)
       futureBufLength += chunkLength
     }
 
+    // signifies the end of the file
+    // since we are all the way through the file, return the signature and pixels
     if (chunkName == 'IEND') {
       const pixel = Buffer.concat(idatBuffers, futureBufLength)
 
@@ -89,6 +96,52 @@ function parsePng(data) {
     }
 
     i = i + chunkLength + 12
+  }
+}
+
+function parsePixels(signature, pixels) {
+  const { height, width, colorType, bitDepth } = signature
+
+  // the product of the colorType and bitDepth determines the bits per pixel
+  let bitsPerPixel = colorChannelMatrix[colorType] * bitDepth
+
+  // using the derived bits per pixel * width, find the bits per row / scanline
+  let bitsPerRow = bitsPerPixel * width
+
+  // finally divide that by 8 to find the bytes per row
+  let bytesPerRow = Math.ceil(bitsPerRow / 8)
+
+  const numScanlines = height
+  let currentScanline = 0
+  const scanlineLength = bytesPerRow + 1 // add one for the filterByte
+
+  // a matrix containing pixel values per row
+  const pixelMap = []
+
+  while (currentScanline < numScanlines) {
+    let transformedRow = []
+    let startingOffset =
+      currentScanline === 0 ? 0 : currentScanline * scanlineLength
+    currentScanline++
+
+    // first, slice the scanline
+    let row = pixels.subarray(startingOffset, startingOffset + scanlineLength)
+
+    // find the filter type and set the offset
+    let filterType = row[0]
+    let offset = 1
+
+    // loop over the row itself
+    while (offset < row.length) {
+      let i = offset
+      offset++
+
+      transformedRow.push(applyPixelFilter(filterType, bitDepth, row))
+    }
+
+    pixelMap.push(transformedRow)
+
+    continue
   }
 }
 
