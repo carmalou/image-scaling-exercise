@@ -115,6 +115,16 @@ function parsePixels(signature, pixels) {
   let currentScanline = 0
   const scanlineLength = bytesPerRow + 1 // add one for the filterByte
 
+  console.log(`
+    
+    bitsPerPixel: ${bitsPerPixel}
+    bitsPerRow: ${bitsPerRow}
+    bytesPerRow: ${bytesPerRow}
+    numScanlines: ${numScanlines}
+    scanline length: ${scanlineLength}
+    
+    `)
+
   // a matrix containing pixel values per row
   const pixelMap = []
 
@@ -124,22 +134,78 @@ function parsePixels(signature, pixels) {
       currentScanline === 0 ? 0 : currentScanline * scanlineLength
     currentScanline++
 
+    console.log(`
+      
+      startingoffset: ${startingOffset}
+      
+      `)
+
     // first, slice the scanline
     let row = pixels.subarray(startingOffset, startingOffset + scanlineLength)
+
+    console.log(`
+      
+      row.length: ${row.length}
+      
+      `)
 
     // find the filter type and set the offset
     let filterType = row[0]
     let offset = 1
 
-    // loop over the row itself
-    while (offset < row.length) {
-      let i = offset
-      offset++
+    console.log(`
+      
+      pixelMap.length: ${pixelMap.length}
+      pixelMap[pixelMap.length-1]: ${pixelMap[pixelMap.length - 1]}
+      
+      `)
 
-      transformedRow.push(applyPixelFilter(filterType, bitDepth, row))
+    // since we're doing the whole row at once, i don't think we need the while loop below anymore
+    const parsedRow = applyPixelFilter(
+      filterType,
+      bitDepth,
+      row,
+      pixelMap[pixelMap.length - 1]
+    )
+
+    if (!parsedRow) {
+      console.log(`
+        
+        filterType: ${filterType}
+        currentScanline: ${currentScanline}
+        
+        `)
     }
 
-    pixelMap.push(transformedRow)
+    if (parsedRow?.length) {
+      console.log('length ', parsedRow.length)
+      console.log(parsedRow[0])
+      console.log(parsedRow[50])
+      console.log(parsedRow[75])
+      console.log(parsedRow[149])
+
+      pixelMap.push(parsedRow)
+    }
+
+    // loop over the row itself
+    // while (offset < row.length) {
+    //   let i = offset
+    //   offset++
+
+    //   const parsedRow = applyPixelFilter(filterType, bitDepth, row)
+
+    //   if (parsedRow?.length) {
+    //     console.log('length ', parsedRow.length)
+    //     console.log(parsedRow[0])
+    //     console.log(parsedRow[50])
+    //     console.log(parsedRow[75])
+    //     console.log(parsedRow[149])
+    //   }
+
+    //   transformedRow.push(applyPixelFilter(filterType, bitDepth, row))
+    // }
+
+    // pixelMap.push(transformedRow)
 
     continue
   }
