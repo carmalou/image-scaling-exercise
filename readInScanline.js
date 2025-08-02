@@ -162,11 +162,11 @@ function parsePixels(signature, pixels) {
     }
 
     if (parsedRow?.length) {
-      console.log('length ', parsedRow.length)
-      console.log(parsedRow[0])
-      console.log(parsedRow[50])
-      console.log(parsedRow[75])
-      console.log(parsedRow[149])
+      // console.log('length ', parsedRow.length)
+      // console.log(parsedRow[0])
+      // console.log(parsedRow[50])
+      // console.log(parsedRow[75])
+      // console.log(parsedRow[149])
 
       if (Number.isNaN(parsedRow[149])) {
         console.log(`

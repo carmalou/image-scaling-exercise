@@ -73,7 +73,7 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
             return
           }
 
-          const b = previousRow[i]
+          const b = previousRow[i - 1]
 
           unfilteredPixels.push((value + b) % 256)
         })
@@ -95,7 +95,7 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           }
 
           if (i === 1) {
-            const b = previousRow[i]
+            const b = previousRow[i - 1]
             const avg = Math.floor(b / 2)
 
             unfilteredPixels.push((value + avg) % 256)
@@ -105,7 +105,7 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
           // here we use the last added value to unfilteredPixels because it is our leftmost _unfiltered_ neighbor -- if we just looked one to the left, we would get a filtered value and it would cause our colors to be off
           const a = unfilteredPixels[unfilteredPixels.length - 1]
-          const b = previousRow[i]
+          const b = previousRow[i - 1]
 
           const avg = Math.floor((a + b) / 2)
 
@@ -129,7 +129,7 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           }
 
           if (i === 1) {
-            const b = previousRow[i]
+            const b = previousRow[i - 1]
 
             unfilteredPixels.push((value + b) % 256)
 
@@ -144,8 +144,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           const a = unfilteredPixels[unfilteredPixels.length - 1]
 
           // here we can use the index because the complete previous row has been passed in
-          const b = previousRow[i]
-          const c = previousRow[i - 1]
+          const b = previousRow[i - 1]
+          const c = previousRow[i - 2]
 
           let difference = paeth(a, b, c)
 
@@ -180,7 +180,7 @@ function paeth(a, b, c) {
     }
 
     return prev
-  }, Infinity)
+  }, a)
 }
 
 module.exports = applyPixelFilter
