@@ -83,15 +83,6 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           unfilteredPixels.push((value + difference) % 256)
         })
 
-        console.log(
-          `
-          
-          case 4 unfilteredPixels
-          
-          `,
-          unfilteredPixels
-        )
-
         return unfilteredPixels
       }
 
