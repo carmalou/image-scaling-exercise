@@ -133,30 +133,15 @@ function parsePixels(signature, pixels) {
       currentScanline === 0 ? 0 : currentScanline * scanlineLength
     currentScanline++
 
-    console.log(`
-      
-      startingoffset: ${startingOffset}
-      
-      `)
-
     // first, slice the scanline
     let row = pixels.subarray(startingOffset, startingOffset + scanlineLength)
 
-    console.log(`
-      
-      row.length: ${row.length}
-      
-      `)
-
     // find the filter type and set the offset
     let filterType = row[0]
-    let offset = 1
-
     console.log(`
       
       pixelMap.length: ${pixelMap.length}
-      pixelMap[pixelMap.length-1]: ${pixelMap[pixelMap.length - 1]}
-      
+       
       `)
 
     // since we're doing the whole row at once, i don't think we need the while loop below anymore
