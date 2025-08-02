@@ -50,6 +50,38 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
       break
 
+    case 3:
+      if (bitDepth === 8) {
+        // average
+        let unfilteredPixels = []
+
+        currentRow.forEach((value, i) => {
+          // first byte is the filtertype, skip it
+          if (i === 0) {
+            return
+          }
+
+          if (i === 1) {
+            const b = previousRow[i]
+            const avg = Math.floor(b / 2)
+
+            unfilteredPixels.push((value + avg) % 256)
+          }
+
+          // here we use the last added value to unfilteredPixels because it is our leftmost _unfiltered_ neighbor -- if we just looked one to the left, we would get a filtered value and it would cause our colors to be off
+          const a = unfilteredPixels[unfilteredPixels.length - 1]
+          const b = previousRow[i]
+
+          const avg = Math.floor((a + b) / 2)
+
+          unfilteredPixels.push((value + avg) % 256)
+        })
+
+        return unfilteredPixels
+      }
+
+      break
+
     case 4:
       if (bitDepth === 8) {
         // Paeth filter -- AKA the WORST ONE
@@ -85,6 +117,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
         return unfilteredPixels
       }
+
+      break
 
     default:
       console.log(`
