@@ -29,6 +29,12 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
       if (bitDepth === 8) {
         let unfilteredPixels = []
 
+        console.log(`
+          
+          case1 currenRow.length: ${currentRow.length}
+          
+          `)
+
         currentRow.forEach((value, i) => {
           // first byte is the filtertype, skip it
           if (i === 0) {
@@ -37,6 +43,7 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
           if (i === 1) {
             unfilteredPixels.push(value)
+            return
           }
 
           // perform look-behind
@@ -44,6 +51,12 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
             (value + unfilteredPixels[unfilteredPixels.length - 1]) % 256
           )
         })
+
+        console.log(`
+          
+          unfilteredPixels length: ${unfilteredPixels.length}
+          
+          `)
 
         return unfilteredPixels
       }
@@ -86,6 +99,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
             const avg = Math.floor(b / 2)
 
             unfilteredPixels.push((value + avg) % 256)
+
+            return
           }
 
           // here we use the last added value to unfilteredPixels because it is our leftmost _unfiltered_ neighbor -- if we just looked one to the left, we would get a filtered value and it would cause our colors to be off
@@ -117,6 +132,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
             const b = previousRow[i]
 
             unfilteredPixels.push((value + b) % 256)
+
+            return
           }
 
           // C is your top-left reference

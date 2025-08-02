@@ -115,15 +115,15 @@ function parsePixels(signature, pixels) {
   let currentScanline = 0
   const scanlineLength = bytesPerRow + 1 // add one for the filterByte
 
-  console.log(`
-    
-    bitsPerPixel: ${bitsPerPixel}
-    bitsPerRow: ${bitsPerRow}
-    bytesPerRow: ${bytesPerRow}
-    numScanlines: ${numScanlines}
-    scanline length: ${scanlineLength}
-    
-    `)
+  // console.log(`
+
+  //   bitsPerPixel: ${bitsPerPixel}
+  //   bitsPerRow: ${bitsPerRow}
+  //   bytesPerRow: ${bytesPerRow}
+  //   numScanlines: ${numScanlines}
+  //   scanline length: ${scanlineLength}
+
+  //   `)
 
   // a matrix containing pixel values per row
   const pixelMap = []
@@ -167,6 +167,14 @@ function parsePixels(signature, pixels) {
       console.log(parsedRow[50])
       console.log(parsedRow[75])
       console.log(parsedRow[149])
+
+      if (Number.isNaN(parsedRow[149])) {
+        console.log(`
+          
+          NaN: filtertype: ${filterType}
+          
+          `)
+      }
 
       pixelMap.push(parsedRow)
     }
