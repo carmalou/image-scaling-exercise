@@ -129,7 +129,6 @@ function parsePixels(signature, pixels) {
   const pixelMap = []
 
   while (currentScanline < numScanlines) {
-    let transformedRow = []
     let startingOffset =
       currentScanline === 0 ? 0 : currentScanline * scanlineLength
     currentScanline++
@@ -186,26 +185,6 @@ function parsePixels(signature, pixels) {
 
       pixelMap.push(parsedRow)
     }
-
-    // loop over the row itself
-    // while (offset < row.length) {
-    //   let i = offset
-    //   offset++
-
-    //   const parsedRow = applyPixelFilter(filterType, bitDepth, row)
-
-    //   if (parsedRow?.length) {
-    //     console.log('length ', parsedRow.length)
-    //     console.log(parsedRow[0])
-    //     console.log(parsedRow[50])
-    //     console.log(parsedRow[75])
-    //     console.log(parsedRow[149])
-    //   }
-
-    //   transformedRow.push(applyPixelFilter(filterType, bitDepth, row))
-    // }
-
-    // pixelMap.push(transformedRow)
 
     continue
   }
