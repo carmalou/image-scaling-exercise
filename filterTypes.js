@@ -8,20 +8,6 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
       `)
   }
   switch (filterType) {
-    case 0:
-      if (bitDepth < 8) {
-        // in this case we are dealing with pixel packing. in modern pngs its probably nearly always "how many bytes in this pixel" but in grayscale + filterType of 0 its "how many pixels in this byte"
-
-        // the byte needs to be transformed to binary and mapped over
-
-        // 0 - black
-        // 1 - white
-
-        return parseInt(row[i]).toString(2).padStart(8, '0').split('')
-      }
-
-      break
-
     // in this case, we are looking to the left to find the value
     case 1:
       // if the bitDepth is 8, each byte is a pixel
@@ -30,19 +16,14 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
         let unfilteredPixels = []
 
         currentRow.forEach((value, i) => {
-          // first byte is the filtertype, skip it
           if (i === 0) {
-            return
-          }
-
-          if (i === 1) {
             unfilteredPixels.push(value)
             return
           }
 
           // perform look-behind
           unfilteredPixels.push(
-            (value + unfilteredPixels[unfilteredPixels.length - 1]) % 256
+            (value + (unfilteredPixels[unfilteredPixels.length - 1] || 0)) % 256
           )
         })
 
@@ -51,17 +32,13 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
 
       break
 
+    // sub
     case 2:
       if (bitDepth === 8) {
         let unfilteredPixels = []
 
         currentRow.forEach((value, i) => {
-          // first byte is the filtertype, skip it
-          if (i === 0) {
-            return
-          }
-
-          const b = previousRow[i - 1]
+          const b = previousRow?.[i] || 0
 
           unfilteredPixels.push((value + b) % 256)
         })
@@ -77,13 +54,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
         let unfilteredPixels = []
 
         currentRow.forEach((value, i) => {
-          // first byte is the filtertype, skip it
           if (i === 0) {
-            return
-          }
-
-          if (i === 1) {
-            const b = previousRow[i - 1]
+            const b = previousRow[i] || 0
             const avg = Math.floor(b / 2)
 
             unfilteredPixels.push((value + avg) % 256)
@@ -92,8 +64,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           }
 
           // here we use the last added value to unfilteredPixels because it is our leftmost _unfiltered_ neighbor -- if we just looked one to the left, we would get a filtered value and it would cause our colors to be off
-          const a = unfilteredPixels[unfilteredPixels.length - 1]
-          const b = previousRow[i - 1]
+          const a = unfilteredPixels[unfilteredPixels.length - 1] || 0
+          const b = previousRow[i] || 0
 
           const avg = Math.floor((a + b) / 2)
 
@@ -111,13 +83,8 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
         let unfilteredPixels = []
 
         currentRow.forEach((value, i) => {
-          // first byte is the filtertype, skip it
           if (i === 0) {
-            return
-          }
-
-          if (i === 1) {
-            const b = previousRow[i - 1]
+            const b = previousRow[i]
 
             unfilteredPixels.push((value + b) % 256)
 
@@ -129,11 +96,11 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
           // A is your left reference
 
           // here we use the last added value to unfilteredPixels because it is our leftmost _unfiltered_ neighbor -- if we just looked one to the left, we would get a filtered value and it would cause our colors to be off
-          const a = unfilteredPixels[unfilteredPixels.length - 1]
+          const a = unfilteredPixels[unfilteredPixels.length - 1] || 0
 
           // here we can use the index because the complete previous row has been passed in
-          const b = previousRow[i - 1]
-          const c = previousRow[i - 2]
+          const b = previousRow[i] || 0
+          const c = previousRow[i - 1] || 0
 
           let difference = paeth(a, b, c)
 
@@ -166,13 +133,13 @@ function paeth(a, b, c) {
 
       if (prev.difference === null) {
         return {
-          value: prev.value,
+          value: curr,
           difference,
         }
       }
 
       const diffObj =
-        difference <= prev.difference ? { value: curr, difference } : prev
+        difference < prev.difference ? { value: curr, difference } : prev
 
       return diffObj
     },

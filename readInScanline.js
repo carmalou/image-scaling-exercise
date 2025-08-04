@@ -124,7 +124,7 @@ function parsePixels(signature, pixels) {
     const parsedRow = applyPixelFilter(
       filterType,
       bitDepth,
-      row,
+      row.slice(1),
       pixelMap[pixelMap.length - 1]
     )
 
