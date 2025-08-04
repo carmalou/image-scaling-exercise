@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs').promises
 const zlib = require('zlib')
 const applyPixelFilter = require('./filterTypes.js')
 
@@ -10,24 +10,16 @@ const colorChannelMatrix = {
   6: 4,
 }
 
-function main() {
-  fs.readFile('sample_images/grayscale-parrot.png', (err, data) => {
-    if (err) {
-      console.error(err)
+async function main() {
+  try {
+    const filedata = await fs.readFile('sample_images/grayscale-parrot.png')
 
-      return
-    }
+    const { signature, pixelBytes } = parsePng(filedata)
 
-    const { signature, pixelBytes } = parsePng(data)
-
-    console.log(`
-      
-      signature: ${JSON.stringify(signature, null, 2)}
-      
-      `)
-
-    parsePixels(signature, pixelBytes)
-  })
+    return parsePixels(signature, pixelBytes)
+  } catch (err) {
+    throw err
+  }
 }
 
 function parsePng(data) {
@@ -115,16 +107,6 @@ function parsePixels(signature, pixels) {
   let currentScanline = 0
   const scanlineLength = bytesPerRow + 1 // add one for the filterByte
 
-  // console.log(`
-
-  //   bitsPerPixel: ${bitsPerPixel}
-  //   bitsPerRow: ${bitsPerRow}
-  //   bytesPerRow: ${bytesPerRow}
-  //   numScanlines: ${numScanlines}
-  //   scanline length: ${scanlineLength}
-
-  //   `)
-
   // a matrix containing pixel values per row
   const pixelMap = []
 
@@ -138,12 +120,6 @@ function parsePixels(signature, pixels) {
 
     // find the filter type and set the offset
     let filterType = row[0]
-    console.log(`
-      
-      pixelMap.length: ${pixelMap.length}
-       
-      `)
-
     // since we're doing the whole row at once, i don't think we need the while loop below anymore
     const parsedRow = applyPixelFilter(
       filterType,
@@ -155,6 +131,8 @@ function parsePixels(signature, pixels) {
     if (!parsedRow) {
       console.log(`
         
+        parsedRow is undefined!!
+
         filterType: ${filterType}
         currentScanline: ${currentScanline}
         
@@ -162,12 +140,6 @@ function parsePixels(signature, pixels) {
     }
 
     if (parsedRow?.length) {
-      // console.log('length ', parsedRow.length)
-      // console.log(parsedRow[0])
-      // console.log(parsedRow[50])
-      // console.log(parsedRow[75])
-      // console.log(parsedRow[149])
-
       if (Number.isNaN(parsedRow[149])) {
         console.log(`
           
@@ -182,7 +154,10 @@ function parsePixels(signature, pixels) {
     continue
   }
 
-  // ok now i have the pixelmap -- a matrix of pixels (one array for each row) -- now what??
+  return {
+    signature,
+    pixelMap,
+  }
 }
 
-main()
+module.exports = main

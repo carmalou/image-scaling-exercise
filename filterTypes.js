@@ -29,12 +29,6 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
       if (bitDepth === 8) {
         let unfilteredPixels = []
 
-        console.log(`
-          
-          case1 currenRow.length: ${currentRow.length}
-          
-          `)
-
         currentRow.forEach((value, i) => {
           // first byte is the filtertype, skip it
           if (i === 0) {
@@ -51,12 +45,6 @@ function applyPixelFilter(filterType, bitDepth, currentRow, previousRow) {
             (value + unfilteredPixels[unfilteredPixels.length - 1]) % 256
           )
         })
-
-        console.log(`
-          
-          unfilteredPixels length: ${unfilteredPixels.length}
-          
-          `)
 
         return unfilteredPixels
       }
