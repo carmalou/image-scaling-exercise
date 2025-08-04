@@ -181,6 +181,8 @@ function parsePixels(signature, pixels) {
 
     continue
   }
+
+  // ok now i have the pixelmap -- a matrix of pixels (one array for each row) -- now what??
 }
 
 main()

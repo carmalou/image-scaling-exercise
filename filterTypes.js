@@ -172,15 +172,29 @@ function paeth(a, b, c) {
   // take the absolute value of the difference between p and the current value
   // compare that difference to the previous difference
   // if the new difference is lesser -- use it
-  return [a, b, c].reduce((prev, curr) => {
-    const difference = Math.abs(p - curr)
+  const leastDiffObj = [a, b, c].reduce(
+    (prev, curr) => {
+      const difference = Math.abs(p - curr)
 
-    if (difference < prev) {
-      return curr
+      if (prev.difference === null) {
+        return {
+          value: prev.value,
+          difference,
+        }
+      }
+
+      const diffObj =
+        difference <= prev.difference ? { value: curr, difference } : prev
+
+      return diffObj
+    },
+    {
+      value: a,
+      difference: null,
     }
+  )
 
-    return prev
-  }, a)
+  return leastDiffObj.value
 }
 
 module.exports = applyPixelFilter
