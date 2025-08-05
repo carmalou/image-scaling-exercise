@@ -2,7 +2,7 @@
 
 My attempt to downscale an image by 50% using box filtering.
 
-First step is to read in the image (which is a png). This is covered in `readInScanline.js` which is not actually a part of this exercise (I covered that in a separate exercise).
+First step is to read in the image (which is a png). This is covered in `readInScanline.js`.
 
 Once we have the scanline, we can start building "the boxes". A box is a 2x2 grid of pixels.
 
